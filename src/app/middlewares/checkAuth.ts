@@ -3,6 +3,9 @@ import AppError from "../errorHelpers/AppError";
 import { verifyToken } from "../utils/jwt";
 import { envVars } from "../config/env";
 import { JwtPayload } from "jsonwebtoken";
+import { User } from "../modules/user/user.model";
+import { IsActive } from "../modules/user/user.interface";
+import httpStatus from "http-status-codes";
 
 export const checkAuth =
   (...authRoles: string[]) =>
@@ -13,17 +16,31 @@ export const checkAuth =
         throw new AppError(403, "No Token Received");
       }
 
-      const verifiedToken = verifyToken(
-        accessToken,
-        envVars.JWT_ACCESS_SECRET
-      ) as JwtPayload;
+      const verifiedToken = verifyToken(accessToken, envVars.JWT_ACCESS_SECRET) as JwtPayload;
+
+      const isUserExist = await User.findOne({ email: verifiedToken.email });
+
+      if (!isUserExist) {
+        throw new AppError(httpStatus.BAD_REQUEST, "User Doesn't exits");
+      }
+
+      // if (isUserExist.isActive == IsActive.BLOCKED || isUserExist.isActive == IsActive.INACTIVE) {
+      //   throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.isActive}`);
+      // }
+      if (isUserExist.isDeleted) {
+        throw new AppError(httpStatus.BAD_REQUEST, "User is Deleted");
+      }
       if (!verifiedToken) {
         throw new AppError(403, "You are not authorized");
       }
+      if (!authRoles.includes(verifiedToken.role)) {
+        throw new AppError(403, "You are not permitted to view this route!!!");
+      }
+
       req.user = verifiedToken;
       next();
-      console.log(verifiedToken);
     } catch (error) {
+      console.log("JWT ERROR :", error);
       next(error);
     }
   };
