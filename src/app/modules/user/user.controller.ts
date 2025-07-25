@@ -4,7 +4,6 @@ import { UserServices } from "./user.service";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 
-
 const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const user = await UserServices.createUser(req.body);
 
@@ -34,11 +33,12 @@ const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     data: user,
   });
 });
+
 const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const payload = req.body;
-  console.log(payload);
+  // console.log(payload);
   const result = await UserServices.getAllUsers();
-  console.log(result.data, result.meta);
+  // console.log(result.data, result.meta);
 
   sendResponse(res, {
     success: true,
