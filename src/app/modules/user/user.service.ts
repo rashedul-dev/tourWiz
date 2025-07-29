@@ -10,10 +10,11 @@ const createUser = async (payload: Partial<IUser>) => {
   const { email, password, ...rest } = payload;
 
   const isUserExist = await User.findOne({ email });
-
-  if (isUserExist) {
-    throw new AppError(httpStatus.BAD_REQUEST, "User Already Exist");
-  }
+  
+  //- ERROR SUCCESSFULLY HANDELD IN GLOBAL ERROR HANDLER
+  // if (isUserExist) {
+  //   throw new AppError(httpStatus.BAD_REQUEST, "User Already Exist");
+  // }
 
   const hashedPassword = await bcryptjs.hash(password as string, Number(envVars.BCRYPT_SALT_ROUND));
 
@@ -43,8 +44,7 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
    * email - can not update
    * name, phone, password address
    * password - re hashing
-   *  only admin superadmin - role, isDeleted...
-   *
+   * only admin superadmin - role, isDeleted...
    * promoting to superadmin - superadmin
    */
 

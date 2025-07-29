@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, response, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status-codes";
@@ -8,29 +8,33 @@ import { setAuthCookie } from "../../utils/setCookie";
 import { JwtPayload } from "jsonwebtoken";
 import { createUserToken } from "../../utils/userTokens";
 import { envVars } from "../../config/env";
+import passport from "passport";
 
 const credentialsLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const loginInfo = await AuthServices.credentialsLogin(req.body);
+  passport.authenticate("local", async (err: any, user: any, info: any) => {
+    if (err) {
+      return next(new AppError(401, err));
+    }
+    if (!user) {
+      return next(new AppError(401, info.message));
+    }
 
-  setAuthCookie(res, loginInfo);
-  // res.cookie("accessToken", loginInfo.accessToken, {
-  //   httpOnly: true,
-  //   secure: false,
-  // });
+    const userToken = await createUserToken(user);
+    const { password: pass, ...rest } = user.toObject();
 
-  // res.cookie("refreshToken", loginInfo.refreshToken, {
-  //   httpOnly: true,
-  //   secure: false,
-  // });
+    setAuthCookie(res, userToken);
 
-  setAuthCookie(res, loginInfo);
-
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "User Login Successfully",
-    data: loginInfo,
-  });
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "User Logged In Successfully",
+      data: {
+        accessToken: userToken.accessToken,
+        refreshToken: userToken.refreshToken,
+        user: rest,
+      },
+    });
+  })(req, res, next);
 });
 
 const getNewAccessToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -105,13 +109,6 @@ const googleCallbackController = catchAsync(async (req: Request, res: Response, 
   const tokenInfo = createUserToken(user);
 
   setAuthCookie(res, tokenInfo);
-
-  // sendResponse(res, {
-  //   success: true,
-  //   statusCode: httpStatus.OK,
-  //   message: "Google Logged In Successfully",
-  //   data: null,
-  // });
 
   res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
 });
