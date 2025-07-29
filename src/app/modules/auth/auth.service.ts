@@ -7,40 +7,6 @@ import { createNewAccessTokenWithRefreshToken, createUserToken } from "../../uti
 import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env";
 
-// const credentialsLogin = async (payload: Partial<IUser>) => {
-//   if (!payload || !payload.email || !payload.password) {
-//     throw new AppError(httpStatus.BAD_REQUEST, "Email and password are required.");
-//   }
-//   const { email, password } = payload;
-//   // console.log(email);
-
-//   const isUserExist = await User.findOne({ email });
-
-//   if (!isUserExist) {
-//     throw new AppError(httpStatus.BAD_REQUEST, "User Does not exist");
-//   }
-//   if (!isUserExist.password) {
-//     throw new AppError(500, "User password does not exist");
-//   }
-
-//   const isUserPasswordMatched = await bcryptjs.compare(password, isUserExist.password);
-
-//   if (!isUserPasswordMatched) {
-//     throw new AppError(httpStatus.BAD_REQUEST, "invalid password");
-//   }
-
-//   //CREATE A UTILS-USERTOKEN AND JUST CALL IT HERE
-//   const userToken = createUserToken(isUserExist);
-
-//   // DELETE PASSWORD FROM THE USER DATA AND RETURN IT TO THE CLIENT
-//   const { password: pass, ...rest } = isUserExist.toObject();
-
-//   return {
-//     accessToken: userToken.accessToken,
-//     refreshToken: userToken.refreshToken,
-//     user: rest,
-//   };
-// };
 
 const getNewAccessToken = async (refreshToken: string) => {
   const newAccessToken = await createNewAccessTokenWithRefreshToken(refreshToken);

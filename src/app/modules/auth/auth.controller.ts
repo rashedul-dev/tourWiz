@@ -11,8 +11,6 @@ import { envVars } from "../../config/env";
 import passport from "passport";
 
 const credentialsLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  // const loginInfo = await AuthServices.credentialsLogin(req.body);
-
   passport.authenticate("local", async (err: any, user: any, info: any) => {
     if (err) {
       return next(new AppError(401, err));
@@ -37,26 +35,6 @@ const credentialsLogin = catchAsync(async (req: Request, res: Response, next: Ne
       },
     });
   })(req, res, next);
-
-  // setAuthCookie(res, loginInfo);
-  // res.cookie("accessToken", loginInfo.accessToken, {
-  //   httpOnly: true,
-  //   secure: false,
-  // });
-
-  // res.cookie("refreshToken", loginInfo.refreshToken, {
-  //   httpOnly: true,
-  //   secure: false,
-  // });
-
-  // setAuthCookie(res, loginInfo);
-
-  // sendResponse(res, {
-  //   success: true,
-  //   statusCode: httpStatus.OK,
-  //   message: "User Login Successfully",
-  //   data: loginInfo,
-  // });
 });
 
 const getNewAccessToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -131,13 +109,6 @@ const googleCallbackController = catchAsync(async (req: Request, res: Response, 
   const tokenInfo = createUserToken(user);
 
   setAuthCookie(res, tokenInfo);
-
-  // sendResponse(res, {
-  //   success: true,
-  //   statusCode: httpStatus.OK,
-  //   message: "Google Logged In Successfully",
-  //   data: null,
-  // });
 
   res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
 });
