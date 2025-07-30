@@ -3,13 +3,24 @@ import { IDivision } from "./division.interface";
 import { Division } from "./division.model";
 
 const createDivision = async (payload: IDivision) => {
-  const isDivisionExist = await Division.findOne({ name: payload.name });
+  const baseSlug = payload.name.toLocaleLowerCase().split(" ").join("-");
+  let slug = `${baseSlug}-division`;
+  console.log(slug);
 
-  if (isDivisionExist) {
-    throw new AppError(401, `${payload.name} division is already exist`);
+  let counter = 0;
+
+  while (await Division.exists({ slug })) {
+    slug = `${slug}-${counter++}`; // dhaka-division-0
   }
-
+  payload.slug = slug;
   const division = await Division.create(payload);
+
+  // const isDivisionExist = await Division.findOne({ name: payload.name });
+
+  // if (isDivisionExist) {
+  //   throw new AppError(401, `${payload.name} division is already exist`);
+  // }
+
   return division;
 };
 
@@ -27,6 +38,15 @@ const getAllDivisions = async () => {
 
 const getSingleDivision = async (slug: string) => {
   return await Division.findOne({ slug });
+};
+const getDivisionBySlug = async (slug: string) => {
+  const division = await Division.findOne({ slug });
+
+  if (!division) {
+    throw new AppError(404, "Division not found");
+  }
+
+  return division;
 };
 
 const updateDivision = async (id: string, payload: Partial<IDivision>): Promise<IDivision | null> => {
@@ -46,7 +66,14 @@ const updateDivision = async (id: string, payload: Partial<IDivision>): Promise<
 
   const updateDivision = await Division.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
 
-  return updateDivision;
+  const division = await Division.findById(id);
+  if (!division) {
+    throw new AppError(404, "Tour not found");
+  }
+
+  const updatedDivision = await Division.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
+
+  return updatedDivision;
 };
 
 const deleteDivision = async (id: string) => {
@@ -58,6 +85,7 @@ export const DivisionServices = {
   createDivision,
   getAllDivisions,
   getSingleDivision,
+  getDivisionBySlug,
   updateDivision,
   deleteDivision,
 };

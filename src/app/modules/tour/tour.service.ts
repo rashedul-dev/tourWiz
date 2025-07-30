@@ -27,14 +27,14 @@ const getAllTours = async () => {
 };
 
 const updateTour = async (id: string, payload: Partial<ITour>) => {
-  const isTourExist = await Tour.findById(id);
-  if (!isTourExist) {
+  const tour = await Tour.findById(id);
+  if (!tour) {
     throw new AppError(401, "Tour not found");
   }
 
-  const updateTour = await Tour.findByIdAndUpdate(id, payload, { new: true });
+  const updatedTour = await Tour.findByIdAndUpdate(id, payload, { new: true });
 
-  return updateTour;
+  return updatedTour;
 };
 
 const deleteTour = async (id: string) => {
@@ -43,7 +43,8 @@ const deleteTour = async (id: string) => {
 /* ------------------- HERE TOURTYPE SERVICE LAYER ----------------- */
 
 const createTourType = async (payload: ITourType) => {
-  const existingTourType = await TourType.findOne({ name: payload.name });
+  const { name } = payload;
+  const existingTourType = await TourType.findOne({ name });
 
   if (existingTourType) {
     throw new Error("Tour type already exists.");

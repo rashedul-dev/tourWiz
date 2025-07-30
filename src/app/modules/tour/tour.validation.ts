@@ -10,11 +10,13 @@ export const createTourZodSchema = z.object({
   tourType: z.string(),
   included: z.array(z.string()),
   excluded: z.array(z.string()),
-  anenities: z.array(z.string()),
+  amenities: z.array(z.string()),
   tourPlan: z.array(z.string()),
   maxGuests: z.number(),
   minAge: z.number(),
-  divisionId: z.string(),
+  division: z.string(),
+  departureLocation: z.string().optional(),
+  arrivalLocation: z.string().optional(),
 });
 
 export const updateTourZodSchema = z.object({
@@ -22,14 +24,14 @@ export const updateTourZodSchema = z.object({
   description: z.string().optional(),
   location: z.string().optional(),
   costFrom: z.number().optional(),
-  startDate: z.string().optional().optional(),
-  endDate: z.string().optional().optional(),
+  startDate: z.coerce.date().optional(),
+  endDate: z.coerce.date().optional(),
   tourType: z.string().optional(),
   included: z.array(z.string()).optional(),
   excluded: z.array(z.string()).optional(),
-  anenities: z.array(z.string()).optional(),
+  amenities: z.array(z.string()).optional(), // ✅ fixed typo
   tourPlan: z.array(z.string()).optional(),
-  maxGuests: z.number().optional(),
+  maxGuest: z.number().optional(), // ✅ matched with your schema
   minAge: z.number().optional(),
 });
 

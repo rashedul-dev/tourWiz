@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { TourService } from "./tour.service";
 import { sendResponse } from "../../utils/sendResponse";
+import AppError from "../../errorHelpers/AppError";
 
 const createTour = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const result = await TourService.createTour(req.body);
@@ -53,7 +54,10 @@ const deleteTour = catchAsync(async (req: Request, res: Response, next: NextFunc
 
 const createTourType = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const { name } = req.body;
-  const result = await TourService.createTourType(name);
+  if (!name) {
+    throw new AppError(400, "Tour type name is required");
+  }
+  const result = await TourService.createTourType({ name });
 
   sendResponse(res, {
     statusCode: 201,
