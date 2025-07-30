@@ -8,7 +8,7 @@ const tourTypeSchema = new Schema<ITourType>(
     timestamps: true,
   }
 );
-const tourType = model<ITourType>("TourType", tourTypeSchema);
+export const TourType = model<ITourType>("TourType", tourTypeSchema);
 
 const tourSchema = new Schema<ITour>(
   {
@@ -42,4 +42,4 @@ const tourSchema = new Schema<ITour>(
   }
 );
 
-const Tour = model<ITour>("Tour", tourSchema);
+export const Tour = model<ITour>("Tour", tourSchema);

@@ -1,5 +1,4 @@
 import { model, Types } from "mongoose";
-import { IDivision } from "../division/division.interface";
 
 export interface ITourType {
   name: string;
