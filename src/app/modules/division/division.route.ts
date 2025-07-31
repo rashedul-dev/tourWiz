@@ -13,26 +13,14 @@ router.post(
   validateRequest(createDivisionZodSchema),
   DivisionController.createDivision
 );
-router.get(
-  "/",
-  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
-  DivisionController.getAllDivisions
-);
-router.get(
-  "/:slug",
-  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
-  DivisionController.getSingleDivision
-);
+router.get("/", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), DivisionController.getAllDivisions);
+router.get("/:slug", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), DivisionController.getSingleDivision);
 router.patch(
   "/:id",
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   validateRequest(updateDivisionZodSchema),
   DivisionController.updateDivision
 );
-router.delete(
-  "/:id",
-  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
-  DivisionController.deleteDivision
-);
+router.delete("/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), DivisionController.deleteDivision);
 
 export const DivisionRoutes = router;

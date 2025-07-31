@@ -1,6 +1,8 @@
 // CREATE -> GETALL -> UPDATE -> DELETE => THIS IS THE WHOLE GAME
 
 import AppError from "../../errorHelpers/AppError";
+import { excludeField } from "../../globalConstants";
+import { tourSearchableFields } from "./tour.constant";
 import { ITour, ITourType } from "./tour.interface";
 import { Tour, TourType } from "./tour.model";
 
@@ -15,14 +17,58 @@ const createTour = async (payload: ITour) => {
   return tour;
 };
 
-const getAllTours = async () => {
-  const tours = await Tour.find({});
+const getAllTours = async (query: Record<string, string>) => {
+  console.log(query);
+
+  const filter = query;
+  const search = query.search || "";
+  const sort = query.sort || "-createdAt";
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const skip = page - 1 * limit;
+
+  //field filtering - to get sprecific data
+  const fields = query.fields?.split("_").join(" ") || "";
+
+  // delete filter["search"];
+  // delete filter["sort"];
+
+  for (const field of excludeField) {
+    delete filter[field];
+  }
+
+  // const tourSearchableFields = ["title", "description", "location"];
+
+  const searchQuery = {
+    $or: tourSearchableFields.map((field) => ({ [field]: { $regex: search, $options: "i" } })),
+  };
+  const tours = await Tour.find(searchQuery).find(filter).sort(sort).select(fields).skip(skip).limit(limit);
+
+  // {
+  // $or: searchArray,
+  /** SAME AS BELLOW - JUST TO CLEAN THE CODE */
+  // title: { $regex: search, $options: "i" },
+  // $or: [
+  //   { title: { $regex: search, $options: "i" } },
+  //   { description: { $regex: search, $options: "i" } },
+  //   { location: { $regex: search, $options: "i" } },
+  // ],
+  // }
+
   const totalTours = await Tour.countDocuments();
+  const totalPage = Math.ceil(totalTours / limit);
+  const meta = {
+    page: page,
+    total: totalTours,
+    totalPage: totalPage,
+    limit: limit,
+  };
   return {
     data: tours,
-    meta: {
-      total: totalTours,
-    },
+    meta: meta,
+    // meta: {
+    //   total: totalTours,
+    // },
   };
 };
 
