@@ -37,12 +37,15 @@ const getAllTours = async (query: Record<string, string>) => {
     delete filter[field];
   }
 
-  // const tourSearchableFields = ["title", "description", "location"];
 
   const searchQuery = {
     $or: tourSearchableFields.map((field) => ({ [field]: { $regex: search, $options: "i" } })),
   };
-  const tours = await Tour.find(searchQuery).find(filter).sort(sort).select(fields).skip(skip).limit(limit);
+  // const tours = await Tour.find(searchQuery).find(filter).sort(sort).select(fields).skip(skip).limit(limit);
+
+  const filterQuery = Tour.find(filter);
+  const tours = filterQuery.find(searchQuery);
+  const allTours = await tours.find(filter).sort(sort).select(fields).skip(skip).limit(limit);
 
   // {
   // $or: searchArray,
@@ -66,9 +69,6 @@ const getAllTours = async (query: Record<string, string>) => {
   return {
     data: tours,
     meta: meta,
-    // meta: {
-    //   total: totalTours,
-    // },
   };
 };
 
